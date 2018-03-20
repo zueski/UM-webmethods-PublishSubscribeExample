@@ -1,0 +1,94 @@
+option java_package = "com.amway.canonical";
+option java_outer_classname = "EventUDM";
+
+message AmGlDocs_Event_EventUDM {
+optional  string Payload = 1;
+optional  EventInfo EventInfo = 2;
+optional  _env _env = 3;
+}
+message _env {
+optional  string activation = 1;
+optional  int32 appLastSeqn = 2;
+optional  string appPassword = 3;
+optional  int32 appSeqn = 4;
+optional  string appUserName = 5;
+optional  int32 priority = 6;
+optional  string businessContext = 7;
+repeated  int32 controlLabel = 8;
+optional  string errorsTo = 9;
+optional  string errorRequestsTo = 10;
+optional  string locale = 11;
+optional  int32 maxResults = 12;
+optional  string replyTo = 13;
+optional  int32 runLevel = 14;
+optional  bytes signature = 15;
+optional  string signatureType = 16;
+optional  int32 startResult = 17;
+optional  int32 tag = 18;
+optional  string trackId = 19;
+optional  string transactionId = 20;
+optional  string transformState = 21;
+optional  int32 age = 22;
+optional  string connectionIntegrity = 23;
+optional  string destId = 24;
+optional  int64 enqueueTime = 25;
+optional  string logBroker = 26;
+optional  string logHost = 27;
+optional  string pubDistinguishedName = 28;
+optional  string pubId = 29;
+optional  bytes pubNetAddr = 30;
+optional  int64 pubSeqn = 31;
+repeated  int32 pubLabel = 32;
+optional  int64 recvTime = 33;
+repeated  _env_route route = 34;
+optional  string uuid = 35;
+optional  string status = 36;
+}
+message _env_route {
+optional  string broker = 1;
+optional  int64 recvTime = 2;
+optional  int64 enqueueTime = 3;
+}
+message EventInfo {
+optional  string EventID = 1;
+optional  string SourceTransactionContextID = 2;
+optional  string EventCode = 3;
+optional  string EventDescription = 4;
+optional  string SourceTimestamp = 5;
+optional  string PublishTimestamp = 6;
+optional  string ActionCode = 7;
+optional  string SourceApplication = 8;
+optional  string SourceIntegrationID = 9;
+optional  string SourceHost = 10;
+optional  string SourceProgram = 11;
+optional  string SourceUser = 12;
+optional  string AccountID = 13;
+optional  string AmwayAffililateCode = 14;
+optional  string ISOAffililateCode = 15;
+optional  string AmwayCountryCode = 16;
+optional  string ISOCountryCode = 17;
+optional  string Company = 18;
+optional  string BusinessUnit = 19;
+optional  string RouteHistory = 20;
+optional  string OrganizationCode = 21;
+optional  string ReasonCode = 22;
+optional  string ABONumber = 23;
+optional  string OperatingUnit = 24;
+optional  string RequestingApplication = 25;
+repeated  BusinessKeys BusinessKeys = 26;
+repeated  RelatedEventIDs RelatedEventIDs = 27;
+optional  SourceIntegrationEnvironment SourceIntegrationEnvironment = 28;
+}
+message BusinessKeys {
+optional  string Key = 1;
+optional  string Value = 2;
+}
+message RelatedEventIDs {
+optional  string Key = 1;
+optional  string Value = 2;
+}
+message SourceIntegrationEnvironment {
+optional  string Name = 1;
+optional  string Level = 2;
+optional  string Host = 3;
+}
