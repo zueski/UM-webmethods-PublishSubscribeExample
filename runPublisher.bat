@@ -9,10 +9,6 @@ if exist lib\*.jar (
     for %%D in (lib\*.jar) do call :appendClasspath "%%D"
 )
 
-if exist lib\*.jar (
-    for %%D in (lib\*.jar) do call :appendClasspath "%%D"
-)
-
 java -classpath "%LOCALCP%" com.amway.integration.um.example.Publisher %*
 
 ENDLOCAL
