@@ -22,7 +22,12 @@ import com.pcbsys.nirvana.client.nSessionNotConnectedException;
 import com.pcbsys.nirvana.client.nUnexpectedResponseException;
 import com.pcbsys.nirvana.client.nUnknownRemoteRealmException;
 
+import java.net.InetAddress;
+import java.util.TimeZone;
 import java.util.Properties;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 import com.amway.canonical.EventUDM;
@@ -53,10 +58,8 @@ public class Publisher extends Client
 	 *            the channel name to publish to
 	 * @param count
 	 *            the number of messages to publish
-	 * @param size
-	 *            the size (bytes) of each message to be published
 	 */
-	private void doit(String[] realmDetails, String achannelName, int count, int size) 
+	private void doit(String[] realmDetails, String achannelName, int count) 
 	{
 		constructSession(realmDetails);
 		// Publishes to the specified channel
@@ -68,7 +71,7 @@ public class Publisher extends Client
 			// Obtain a reference to the channel
 			nChannel myChannel = mySession.findChannel(nca);
 			// Inform the user that publishing is about to start
-			System.out.println("Starting publish of " + count + " events with a size of " + size + " bytes each");
+			System.out.println("Starting publish of " + count + " events");
 			// Obtain the channel's last event ID prior to us publishing
 			// anything
 			long startEid = myChannel.getLastEID();
@@ -79,8 +82,20 @@ public class Publisher extends Client
 			for (int x = 0; x < count; x++) 
 			{
 				//create builder for event, this should get encapsulated into its own class by schema probably
+				String myEventID = "event_" + x;
+				String myEventCode = "TestEventType";
+				TimeZone tz = TimeZone.getTimeZone("UTC");
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+				df.setTimeZone(tz);
+				String mySourceTimestamp = df.format(new Date());
 				EventUDM.AmGlDocs_Event_EventUDM.Builder builder = EventUDM.AmGlDocs_Event_EventUDM.newBuilder();
 				builder.setPayload("iter_"+x);
+				// create nested document
+				builder.getEventInfoBuilder()
+					.setEventID(myEventID)
+					.setEventCode(myEventCode)
+					.setSourceTimestamp(mySourceTimestamp)
+					.setSourceHost(InetAddress.getLocalHost().getHostName());
 				// update envelope,
 				String uuid = UUID.randomUUID().toString();
 				builder.getEnvBuilder()
@@ -139,10 +154,9 @@ public class Publisher extends Client
 			// Calculate the events / sec rate
 			long eventPerSec = (((events) * 1000) / ((end + 1) - start));
 			// Calculate the bytes / sec rate
-			long bytesPerSec = eventPerSec * size;
 			// Inform the user of the resulting rates
 			System.out.println("Publish Completed : ");
-			System.out.println("[Events Published = " + events + "]  [Events/Second = " + eventPerSec + "]  [Bytes/Second = " + bytesPerSec + "]"); 
+			System.out.println("[Events Published = " + events + "]  [Events/Second = " + eventPerSec + "]"); 
 			System.out.println("Bandwidth data : Bytes Tx [" + mySession.getOutputByteCount() + "] Bytes Rx [" + mySession.getInputByteCount() + "]");
 		} catch (nChannelNotFoundException cnfe) {
 			System.out.println("The channel specified could not be found.");
@@ -178,6 +192,10 @@ public class Publisher extends Client
 			System.out.println("An error occured while creating the Channel Attributes object. (" + achannelName + ")");
 			nbce.printStackTrace();
 			System.exit(1);
+		} catch (java.net.UnknownHostException uhe) {
+			System.out.println("An error occured while getting the host name");
+			uhe.printStackTrace();
+			System.exit(1);
 		}
 		// Close the session we opened
 		try 
@@ -212,15 +230,6 @@ public class Publisher extends Client
 				count = Integer.parseInt(publisher.getProperty("COUNT"));
 			} catch (Exception num) { } // Ignore and use the defaults
 		}
-		int size = 100; // default value
-		// Check if the size (bytes) of each message has been specified
-		if(publisher.getProperty("SIZE") != null)
-		{
-			try
-			{
-				size = Integer.parseInt(publisher.getProperty("SIZE"));
-			} catch (Exception num) { } // Ignore and use the default
-		}
 		// Check the local realm details
 		int idx = 0;
 		String RNAME = null;
@@ -235,7 +244,7 @@ public class Publisher extends Client
 		String[] rproperties = new String[4];
 		rproperties = parseRealmProperties(RNAME);
 		// Publish to the channel specified
-		publisher.doit(rproperties, channelName, count, size);
+		publisher.doit(rproperties, channelName, count);
 	}
 
 	/**
